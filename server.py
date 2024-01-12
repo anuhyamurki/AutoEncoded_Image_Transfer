@@ -1,5 +1,4 @@
 import socket
-import os    
 import tkinter as tk
 from tkinter import filedialog
 import time
@@ -16,16 +15,20 @@ def send_image_server(ip, port, image_path):
         data_connection, address = server_socket.accept()
         print(f"Connection from {address}")
 
+        start_time = time.time()    
         with open(image_path, 'rb') as file:
             image_data = file.read()
 
         data_connection.sendall(image_data)
         data_connection.close()
 
-        print("Image has sent successfully")
+        end_time = time.time()
+        transfer_time = end_time - start_time
+
+        print(f"Image has sent successfully in {transfer_time}")
 
 if __name__ == "__main__":
-    server_ip = '127.0.0.1' # Keep the server ip
+    server_ip = '' # Keep the server ip
     server_port = 55555 # any random always free port
     root = tk.Tk()
     root.withdraw()
