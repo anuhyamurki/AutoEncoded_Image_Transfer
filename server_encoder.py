@@ -37,7 +37,7 @@ class Encoder(nn.Module):
 
 
 encoder = Encoder()
-encoder.load_state_dict(torch.load('Models\encoder_model.pth', map_location=torch.device('cpu')))
+encoder.load_state_dict(torch.load('Tests\Scripts\encoder_model.pth', map_location=torch.device('cpu')))
 encoder.eval()
 
 def send_image_server(ip, port, image_path):
@@ -51,7 +51,7 @@ def send_image_server(ip, port, image_path):
         data_connection, address = server_socket.accept()
         print(f"Connection from {address}")
 
-        start_time = time.time()    
+         
         with open(image_path, 'rb') as file:
             image_data = file.read()
             pil_image = Image.open(io.BytesIO(image_data))
@@ -67,10 +67,11 @@ def send_image_server(ip, port, image_path):
         image_tensor = transform(pil_image).unsqueeze(0)
         # Pass the resized image tensor to the encoder
         encoded_output = encoder(image_tensor)
+
         buffer = io.BytesIO()
         torch.save(encoded_output, buffer)
         encoded_output_bytes = buffer.getvalue()
-
+        start_time = time.time()   
         # Now you can send `encoded_output_bytes` over the network connection
         # For example, assuming `data_connection` is a socket
         data_connection.sendall(encoded_output_bytes)
@@ -82,7 +83,7 @@ def send_image_server(ip, port, image_path):
         print(f"Image has sent successfully in {transfer_time}")
 
 if __name__ == "__main__":
-    server_ip = '192.168.56.1' # Keep the server ip
+    server_ip = '' # Keep the server ip
     server_port = 55555 # any random always free port
     root = tk.Tk()
     root.withdraw()

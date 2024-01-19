@@ -29,7 +29,7 @@ class Decoder(nn.Module):
 
 
 decoder = Decoder()
-decoder.load_state_dict(torch.load('Models\decoder_model.pth',map_location=torch.device('cpu')))
+decoder.load_state_dict(torch.load('Tests\Scripts\decoder_model.pth',map_location=torch.device('cpu')))
 decoder.eval()
 print(decoder)
 
@@ -45,9 +45,10 @@ def receive_image_client(server_ip, server_port):
         if not chunk:
             break
         image_data += chunk
-    received_encoded_output = torch.load(io.BytesIO(image_data))
     end_time = time.time()
     transfer_time = end_time - start_time
+    received_encoded_output = torch.load(io.BytesIO(image_data))
+    
 
     print(f"Image received successfully in {transfer_time} seconds")
     client_socket.close()
@@ -71,7 +72,7 @@ def display_received_image(encoded_output):
    
 
 if __name__ == "__main__":
-    server_ip = '192.168.56.1' # Keep the server IP here
+    server_ip = '' # Keep the server IP here
     server_port = 55555 # Random port which is free at any time
 
     receive_image_client(server_ip, server_port)
