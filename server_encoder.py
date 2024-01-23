@@ -37,7 +37,8 @@ class Encoder(nn.Module):
 
 
 encoder = Encoder()
-encoder.load_state_dict(torch.load('Tests\Scripts\encoder_model.pth', map_location=torch.device('cpu')))
+# here if Tests/Scripts/encoder_model.pth is not found then try using Tests\Scripts\encoder_model.pth
+encoder.load_state_dict(torch.load('Tests/Scripts/encoder_model.pth', map_location=torch.device('cpu')))
 encoder.eval()
 
 def send_image_server(ip, port, image_path):
@@ -74,16 +75,15 @@ def send_image_server(ip, port, image_path):
         start_time = time.time()   
         # Now you can send `encoded_output_bytes` over the network connection
         # For example, assuming `data_connection` is a socket
+        
+        # Here we are sending the encoded output bytes and the start time of the transfer
+        # b'   ' is used as a delimiter to separate the encoded output bytes and the start time
+        encoded_output_bytes=encoded_output_bytes+b'   '+(str(start_time)).encode()
         data_connection.sendall(encoded_output_bytes)
         data_connection.close()
 
-        end_time = time.time()
-        transfer_time = end_time - start_time
-
-        print(f"Image has sent successfully in {transfer_time}")
-
 if __name__ == "__main__":
-    server_ip = '' # Keep the server ip
+    server_ip = '127.0.0.1' # Keep the server ip
     server_port = 55555 # any random always free port
     root = tk.Tk()
     root.withdraw()

@@ -15,20 +15,19 @@ def send_image_server(ip, port, image_path):
         data_connection, address = server_socket.accept()
         print(f"Connection from {address}")
 
-        start_time = time.time()    
         with open(image_path, 'rb') as file:
             image_data = file.read()
 
+        # convert the start time to bytes and append it to the image data
+        start_time=time.time()
+        image_data=image_data+b"   "+(str(start_time)).encode()
         data_connection.sendall(image_data)
         data_connection.close()
 
-        end_time = time.time()
-        transfer_time = end_time - start_time
 
-        print(f"Image has sent successfully in {transfer_time}")
 
 if __name__ == "__main__":
-    server_ip = '' # Keep the server ip
+    server_ip = '127.0.0.1' # Keep the server ip
     server_port = 55555 # any random always free port
     root = tk.Tk()
     root.withdraw()

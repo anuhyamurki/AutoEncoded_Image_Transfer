@@ -29,7 +29,8 @@ class Decoder(nn.Module):
 
 
 decoder = Decoder()
-decoder.load_state_dict(torch.load('Tests\Scripts\decoder_model.pth',map_location=torch.device('cpu')))
+# here if Tests/Scripts/decoder_model.pth is not found then try using Tests\Scripts\decoder_model.pth
+decoder.load_state_dict(torch.load('Tests/Scripts/decoder_model.pth',map_location=torch.device('cpu')))
 decoder.eval()
 print(decoder)
 
@@ -46,9 +47,13 @@ def receive_image_client(server_ip, server_port):
             break
         image_data += chunk
     end_time = time.time()
-    transfer_time = end_time - start_time
+    # The start time is sent from the server as a string which is decoded here
+    start_time=(image_data.split(b"   ")[1]).decode()
+    image_data=image_data.split(b"   ")[0]
+
+    # Transfer time is calculated here
+    transfer_time = end_time - float(start_time)
     received_encoded_output = torch.load(io.BytesIO(image_data))
-    
 
     print(f"Image received successfully in {transfer_time} seconds")
     client_socket.close()
