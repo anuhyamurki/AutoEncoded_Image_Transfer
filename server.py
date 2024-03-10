@@ -1,8 +1,6 @@
 import socket
-import tkinter as tk
-from tkinter import filedialog
 import time
-
+import cv2
 
 def send_image_server(ip, port, image_path):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -15,25 +13,34 @@ def send_image_server(ip, port, image_path):
         data_connection, address = server_socket.accept()
         print(f"Connection from {address}")
 
-        with open(image_path, 'rb') as file:
-            image_data = file.read()
+        # Open the image using cv2 and resize to 256x256
+        try:
+            image = cv2.imread(image_path)
+            resized_image = cv2.resize(image, (256, 256))  # Use cv2 for resizing
 
-        # convert the start time to bytes and append it to the image data
-        start_time=time.time()
-        image_data=image_data+b"   "+(str(start_time)).encode()
-        data_connection.sendall(image_data)
+            # Convert to RGB format for byte conversion (if necessary)
+            if resized_image.shape[2] == 3:  # Already RGB
+                resized_image_data = resized_image.tobytes()
+            else:  # Convert to RGB
+                resized_image_data = cv2.cvtColor(resized_image, cv2.COLOR_BGR2RGB).tobytes()
+
+        except FileNotFoundError:
+            print(f"Error: File '{image_path}' not found.")
+            data_connection.close()
+            continue
+
+        # Combine image data with start time
+        start_time = time.time()
+        image_data_with_time = resized_image_data + b"     " + (str(start_time)).encode()
+
+
+        # Send the combined data directly
+        data_connection.sendall(image_data_with_time)
         data_connection.close()
 
-
-
 if __name__ == "__main__":
-    server_ip = '127.0.0.1' # Keep the server ip
-    server_port = 55555 # any random always free port
-    root = tk.Tk()
-    root.withdraw()
+    server_ip = '10.50.25.126'
+    server_port = 55555
+    image_path = "./Lake.jpg"
 
-    file_path = filedialog.askopenfilename()
-    print(file_path)
-    image_to_send = file_path  # Replace with the actual image path
-
-    send_image_server(server_ip, server_port, image_to_send)
+    send_image_server(server_ip, server_port, image_path)

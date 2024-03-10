@@ -10,35 +10,26 @@ from PIL import Image
 import io
 import torchvision.transforms as transforms
 
-
 class Encoder(nn.Module):
     def __init__(self):
         super(Encoder, self).__init__()
-
-        # Encoder layers
-         # conv layer (depth from 3 --> 64), 3x3 kernels
-        self.conv1 = nn.Conv2d(3, 64, kernel_size=3, padding=1)
-         # conv layer (depth from 3 --> 16), 3x3 kernels
-        self.conv2 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
-         # conv layer (depth from 3 --> 16), 3x3 kernels
-        self.conv3 = nn.Conv2d(128, 256, kernel_size=3, padding=1)
-        self.pool = nn.MaxPool2d(2, 2)
+        self.conv1 = nn.Conv2d(3, 32, kernel_size=3, stride=2, padding=1)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1)
+        self.conv3 = nn.Conv2d(64, 128, kernel_size=3, stride=2, padding=1)
+        self.conv4 = nn.Conv2d(128, 256, kernel_size=3, stride=2, padding=1)
+        self.bottleneck = nn.Conv2d(256, 64, kernel_size=3, stride=1, padding=1)
 
     def forward(self, x):
-
-        # Encoder
         x = F.relu(self.conv1(x))
-        x = self.pool(x)
         x = F.relu(self.conv2(x))
-        x = self.pool(x)
         x = F.relu(self.conv3(x))
-        x_encoded = self.pool(x)
-        return x_encoded
-
+        x = F.relu(self.conv4(x))
+        x = self.bottleneck(x)
+        return x
 
 encoder = Encoder()
 # here if Tests/Scripts/encoder_model.pth is not found then try using Tests\Scripts\encoder_model.pth
-encoder.load_state_dict(torch.load('Tests/Scripts/encoder_model.pth', map_location=torch.device('cpu')))
+encoder.load_state_dict(torch.load('Tests/Scripts/PgIC_encoder_256x_200e.pth', map_location=torch.device('cpu')))
 encoder.eval()
 
 def send_image_server(ip, port, image_path):
@@ -83,7 +74,7 @@ def send_image_server(ip, port, image_path):
         data_connection.close()
 
 if __name__ == "__main__":
-    server_ip = '127.0.0.1' # Keep the server ip
+    server_ip = '10.50.25.126' # Keep the server ip
     server_port = 55555 # any random always free port
     root = tk.Tk()
     root.withdraw()
