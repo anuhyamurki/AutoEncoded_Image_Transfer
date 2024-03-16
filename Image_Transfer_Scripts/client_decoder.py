@@ -11,14 +11,32 @@ import torch.nn.functional as F
 from PIL import Image
 
 
-class Decoder(nn.Module):
+# class Decoder(nn.Module):
+#     def __init__(self):
+#         super(Decoder, self).__init__()
+#         self.deconv1 = nn.ConvTranspose2d(64, 256, kernel_size=3, stride=2, padding=1, output_padding=1)
+#         self.deconv2 = nn.ConvTranspose2d(256, 128, kernel_size=3, stride=2, padding=1, output_padding=1)
+#         self.deconv3 = nn.ConvTranspose2d(128, 64, kernel_size=3, stride=2, padding=1, output_padding=1)
+#         self.deconv4 = nn.ConvTranspose2d(64, 32, kernel_size=3, stride=2, padding=1, output_padding=1)
+#         self.deconv5 = nn.ConvTranspose2d(32, 3, kernel_size=3, stride=1, padding=1)
+
+#     def forward(self, x):
+#         x = F.relu(self.deconv1(x))
+#         x = F.relu(self.deconv2(x))
+#         x = F.relu(self.deconv3(x))
+#         x = F.relu(self.deconv4(x))
+#         x = torch.sigmoid(self.deconv5(x))
+#         return x
+
+#Decoder
+class Decoder(nn.Module): # New architecture (9M)
     def __init__(self):
         super(Decoder, self).__init__()
-        self.deconv1 = nn.ConvTranspose2d(64, 256, kernel_size=3, stride=2, padding=1, output_padding=1)
-        self.deconv2 = nn.ConvTranspose2d(256, 128, kernel_size=3, stride=2, padding=1, output_padding=1)
-        self.deconv3 = nn.ConvTranspose2d(128, 64, kernel_size=3, stride=2, padding=1, output_padding=1)
-        self.deconv4 = nn.ConvTranspose2d(64, 32, kernel_size=3, stride=2, padding=1, output_padding=1)
-        self.deconv5 = nn.ConvTranspose2d(32, 3, kernel_size=3, stride=1, padding=1)
+        self.deconv1 = nn.ConvTranspose2d(64, 512, kernel_size=3, stride=1, padding=1)
+        self.deconv2 = nn.ConvTranspose2d(512, 256, kernel_size=5, stride=2, padding=2, output_padding=1)
+        self.deconv3 = nn.ConvTranspose2d(256, 128, kernel_size=5, stride=2, padding=2, output_padding=1)
+        self.deconv4 = nn.ConvTranspose2d(128, 64, kernel_size=5, stride=2, padding=2, output_padding=1)
+        self.deconv5 = nn.ConvTranspose2d(64, 3, kernel_size=5, stride=2, padding=2, output_padding=1)
 
     def forward(self, x):
         x = F.relu(self.deconv1(x))
@@ -32,8 +50,10 @@ class Decoder(nn.Module):
 decoder = Decoder()
 # here if Tests/Scripts/decoder_model.pth is not found then try using Tests\Scripts\decoder_model.pth
 decoder.load_state_dict(
-    torch.load("Tests/Scripts/PgIC_decoder_256x_200e.pth", map_location=torch.device("cpu"))
-)
+    #torch.load(r"C:\Users\aryan\OneDrive\Desktop\Projects\CONVAE-IE\Kashyap-Branch\AutoEncoded_Image_Transfer\AutoEncoder_Weights\PgIC_decoder_256x_200e.pth", map_location=torch.device("cpu"))
+    torch.load(r"C:\Users\aryan\OneDrive\Desktop\Projects\CONVAE-IE\Kashyap-Branch\AutoEncoded_Image_Transfer\AutoEncoder_Weights\PgIC_decoder_9M.pth", map_location=torch.device("cpu"))
+
+)   
 decoder.eval()
 print(decoder)
 
@@ -71,7 +91,7 @@ def display_received_image(encoded_output):
     # image = Image.open(BytesIO(decoded_output))
     decoded_output_np = decoded_output.detach().numpy()
     img = np.transpose(decoded_output_np[0], (1, 2, 0))
-
+    plt.imsave('received_image.png', img)
     fig, ax = plt.subplots(figsize=(5, 5))
     ax.imshow(img)
     ax.get_xaxis().set_visible(False)
@@ -80,9 +100,17 @@ def display_received_image(encoded_output):
     plt.title("recieved image")
     plt.show()
 
+def get_host_ip():
+    try:
+        host_name = socket.gethostname()
+        host_ip = socket.gethostbyname(host_name)
+        return host_ip
+    except:
+        print("Unable to get Hostname and IP")
+        return None
 
 if __name__ == "__main__":
-    server_ip = "10.50.25.126"  # Keep the server IP here
+    server_ip = get_host_ip()  # Keep the server IP here
     server_port = 55555  # Random port which is free at any time
 
     receive_image_client(server_ip, server_port)
