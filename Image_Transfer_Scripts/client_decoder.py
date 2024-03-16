@@ -50,8 +50,8 @@ class Decoder(nn.Module): # New architecture (9M)
 decoder = Decoder()
 # here if Tests/Scripts/decoder_model.pth is not found then try using Tests\Scripts\decoder_model.pth
 decoder.load_state_dict(
-    #torch.load(r"C:\Users\aryan\OneDrive\Desktop\Projects\CONVAE-IE\Kashyap-Branch\AutoEncoded_Image_Transfer\AutoEncoder_Weights\PgIC_decoder_256x_200e.pth", map_location=torch.device("cpu"))
-    torch.load(r"C:\Users\aryan\OneDrive\Desktop\Projects\CONVAE-IE\Kashyap-Branch\AutoEncoded_Image_Transfer\AutoEncoder_Weights\PgIC_decoder_9M.pth", map_location=torch.device("cpu"))
+    #torch.load(r"AutoEncoded_Image_Transfer\AutoEncoder_Weights\PgIC_decoder_256x_200e.pth", map_location=torch.device("cpu"))
+    torch.load(r"AutoEncoded_Image_Transfer\AutoEncoder_Weights\PgIC_decoder_9M.pth", map_location=torch.device("cpu"))
 
 )   
 decoder.eval()

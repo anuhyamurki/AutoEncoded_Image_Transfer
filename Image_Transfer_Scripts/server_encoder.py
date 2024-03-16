@@ -48,8 +48,8 @@ class Encoder(nn.Module): # New architecture (9M)
 encoder = Encoder()
 # here if Tests/Scripts/encoder_model.pth is not found then try using Tests\Scripts\encoder_model.pth
 encoder.load_state_dict(
-    #torch.load(r'C:\Users\aryan\OneDrive\Desktop\Projects\CONVAE-IE\Kashyap-Branch\AutoEncoded_Image_Transfer\AutoEncoder_Weights\PgIC_encoder_256x_200e.pth', map_location=torch.device('cpu'))
-    torch.load(r'C:\Users\aryan\OneDrive\Desktop\Projects\CONVAE-IE\Kashyap-Branch\AutoEncoded_Image_Transfer\AutoEncoder_Weights\PgIC_encoder_9M.pth', map_location=torch.device('cpu'))
+    #torch.load(r'AutoEncoded_Image_Transfer\AutoEncoder_Weights\PgIC_encoder_256x_200e.pth', map_location=torch.device('cpu'))
+    torch.load(r'AutoEncoded_Image_Transfer\AutoEncoder_Weights\PgIC_encoder_9M.pth', map_location=torch.device('cpu'))
     )
 encoder.eval()
 
