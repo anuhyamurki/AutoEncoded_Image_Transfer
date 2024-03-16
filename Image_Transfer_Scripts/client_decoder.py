@@ -11,32 +11,14 @@ import torch.nn.functional as F
 from PIL import Image
 
 
-# class Decoder(nn.Module):
-#     def __init__(self):
-#         super(Decoder, self).__init__()
-#         self.deconv1 = nn.ConvTranspose2d(64, 256, kernel_size=3, stride=2, padding=1, output_padding=1)
-#         self.deconv2 = nn.ConvTranspose2d(256, 128, kernel_size=3, stride=2, padding=1, output_padding=1)
-#         self.deconv3 = nn.ConvTranspose2d(128, 64, kernel_size=3, stride=2, padding=1, output_padding=1)
-#         self.deconv4 = nn.ConvTranspose2d(64, 32, kernel_size=3, stride=2, padding=1, output_padding=1)
-#         self.deconv5 = nn.ConvTranspose2d(32, 3, kernel_size=3, stride=1, padding=1)
-
-#     def forward(self, x):
-#         x = F.relu(self.deconv1(x))
-#         x = F.relu(self.deconv2(x))
-#         x = F.relu(self.deconv3(x))
-#         x = F.relu(self.deconv4(x))
-#         x = torch.sigmoid(self.deconv5(x))
-#         return x
-
-#Decoder
-class Decoder(nn.Module): # New architecture (9M)
+class Decoder(nn.Module):
     def __init__(self):
         super(Decoder, self).__init__()
-        self.deconv1 = nn.ConvTranspose2d(64, 512, kernel_size=3, stride=1, padding=1)
-        self.deconv2 = nn.ConvTranspose2d(512, 256, kernel_size=5, stride=2, padding=2, output_padding=1)
-        self.deconv3 = nn.ConvTranspose2d(256, 128, kernel_size=5, stride=2, padding=2, output_padding=1)
-        self.deconv4 = nn.ConvTranspose2d(128, 64, kernel_size=5, stride=2, padding=2, output_padding=1)
-        self.deconv5 = nn.ConvTranspose2d(64, 3, kernel_size=5, stride=2, padding=2, output_padding=1)
+        self.deconv1 = nn.ConvTranspose2d(64, 256, kernel_size=3, stride=2, padding=1, output_padding=1)
+        self.deconv2 = nn.ConvTranspose2d(256, 128, kernel_size=3, stride=2, padding=1, output_padding=1)
+        self.deconv3 = nn.ConvTranspose2d(128, 64, kernel_size=3, stride=2, padding=1, output_padding=1)
+        self.deconv4 = nn.ConvTranspose2d(64, 32, kernel_size=3, stride=2, padding=1, output_padding=1)
+        self.deconv5 = nn.ConvTranspose2d(32, 3, kernel_size=3, stride=1, padding=1)
 
     def forward(self, x):
         x = F.relu(self.deconv1(x))
@@ -46,12 +28,30 @@ class Decoder(nn.Module): # New architecture (9M)
         x = torch.sigmoid(self.deconv5(x))
         return x
 
+#Decoder
+# class Decoder(nn.Module): # New architecture (9M)
+#     def __init__(self):
+#         super(Decoder, self).__init__()
+#         self.deconv1 = nn.ConvTranspose2d(64, 512, kernel_size=3, stride=1, padding=1)
+#         self.deconv2 = nn.ConvTranspose2d(512, 256, kernel_size=5, stride=2, padding=2, output_padding=1)
+#         self.deconv3 = nn.ConvTranspose2d(256, 128, kernel_size=5, stride=2, padding=2, output_padding=1)
+#         self.deconv4 = nn.ConvTranspose2d(128, 64, kernel_size=5, stride=2, padding=2, output_padding=1)
+#         self.deconv5 = nn.ConvTranspose2d(64, 3, kernel_size=5, stride=2, padding=2, output_padding=1)
+
+#     def forward(self, x):
+#         x = F.relu(self.deconv1(x))
+#         x = F.relu(self.deconv2(x))
+#         x = F.relu(self.deconv3(x))
+#         x = F.relu(self.deconv4(x))
+#         x = torch.sigmoid(self.deconv5(x))
+#         return x
+
 
 decoder = Decoder()
 # here if Tests/Scripts/decoder_model.pth is not found then try using Tests\Scripts\decoder_model.pth
 decoder.load_state_dict(
-    #torch.load(r"AutoEncoded_Image_Transfer\AutoEncoder_Weights\PgIC_decoder_256x_200e.pth", map_location=torch.device("cpu"))
-    torch.load(r"AutoEncoded_Image_Transfer\AutoEncoder_Weights\PgIC_decoder_9M.pth", map_location=torch.device("cpu"))
+    torch.load(r"AutoEncoded_Image_Transfer\AutoEncoder_Weights\Working\PgIC_decoder_256x_200e.pth", map_location=torch.device("cpu"))
+    #torch.load(r"AutoEncoded_Image_Transfer\AutoEncoder_Weights\PgIC_decoder_9M.pth", map_location=torch.device("cpu"))
 
 )   
 decoder.eval()
