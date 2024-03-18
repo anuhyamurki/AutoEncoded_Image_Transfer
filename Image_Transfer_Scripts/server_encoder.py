@@ -10,7 +10,7 @@ from PIL import Image
 import io
 import torchvision.transforms as transforms
 
-class Encoder(nn.Module):
+class Encoder(nn.Module): # Old architecture (1M)
     def __init__(self):
         super(Encoder, self).__init__()
         self.conv1 = nn.Conv2d(3, 32, kernel_size=3, stride=2, padding=1)
@@ -27,9 +27,30 @@ class Encoder(nn.Module):
         x = self.bottleneck(x)
         return x
 
+# Encoder
+# class Encoder(nn.Module): # New architecture (9M)
+#     def __init__(self):
+#         super(Encoder, self).__init__()
+#         self.conv1 = nn.Conv2d(3, 64, kernel_size=5, stride=2, padding=2)
+#         self.conv2 = nn.Conv2d(64, 128, kernel_size=5, stride=2, padding=2)
+#         self.conv3 = nn.Conv2d(128, 256, kernel_size=5, stride=2, padding=2)
+#         self.conv4 = nn.Conv2d(256, 512, kernel_size=5, stride=2, padding=2)
+#         self.bottleneck = nn.Conv2d(512, 64, kernel_size=3, stride=1, padding=1)
+
+#     def forward(self, x):
+#         x = F.relu(self.conv1(x))
+#         x = F.relu(self.conv2(x))
+#         x = F.relu(self.conv3(x))
+#         x = F.relu(self.conv4(x))
+#         x = self.bottleneck(x)
+#         return x
+
 encoder = Encoder()
 # here if Tests/Scripts/encoder_model.pth is not found then try using Tests\Scripts\encoder_model.pth
-encoder.load_state_dict(torch.load('Tests/Scripts/PgIC_encoder_256x_200e.pth', map_location=torch.device('cpu')))
+encoder.load_state_dict(
+    torch.load(r'AutoEncoded_Image_Transfer\AutoEncoder_Weights\Working\PgIC_encoder_256x_200e.pth', map_location=torch.device('cpu'))
+    #torch.load(r'AutoEncoded_Image_Transfer\AutoEncoder_Weights\PgIC_encoder_9M.pth', map_location=torch.device('cpu'))
+    )
 encoder.eval()
 
 def send_image_server(ip, port, image_path):
@@ -57,6 +78,8 @@ def send_image_server(ip, port, image_path):
         pil_image = pil_image.convert('RGB')
 
         image_tensor = transform(pil_image).unsqueeze(0)
+        pil_resized = pil_image.resize((256, 256))
+        pil_resized.save('resized_image.png')
         # Pass the resized image tensor to the encoder
         encoded_output = encoder(image_tensor)
 
@@ -73,8 +96,18 @@ def send_image_server(ip, port, image_path):
         data_connection.sendall(encoded_output_bytes)
         data_connection.close()
 
+def get_host_ip():
+    try:
+        host_name = socket.gethostname()
+        host_ip = socket.gethostbyname(host_name)
+        return host_ip
+    except:
+        print("Unable to get Hostname and IP")
+        return None
+
 if __name__ == "__main__":
-    server_ip = '10.50.25.126' # Keep the server ip
+   
+    server_ip = get_host_ip() # Keep the server ip
     server_port = 55555 # any random always free port
     root = tk.Tk()
     root.withdraw()
