@@ -1,5 +1,7 @@
 # AutoEncoded_Image_Transfer
-Compressing images using Autoencoders and transferring them over the network
+Compressing images using Autoencoders and transferring them over the network. Currently supports image transfer at 256x256 image resolution.
+
+### Dataset: Stanford Dogs Dataset, Animals-10
 
 ## There are 3 directories
 

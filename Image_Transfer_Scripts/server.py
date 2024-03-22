@@ -39,7 +39,7 @@ def send_image_server(ip, port, image_path):
         data_connection.close()
 
 if __name__ == "__main__":
-    server_ip = '10.50.25.126'
+    server_ip = '10.53.29.124'
     server_port = 55555
     image_path = "./Lake.jpg"
 
