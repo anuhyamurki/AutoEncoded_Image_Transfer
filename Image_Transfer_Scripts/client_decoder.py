@@ -50,7 +50,7 @@ class Decoder(nn.Module):
 decoder = Decoder()
 # here if Tests/Scripts/decoder_model.pth is not found then try using Tests\Scripts\decoder_model.pth
 decoder.load_state_dict(
-    torch.load(r"AutoEncoded_Image_Transfer\AutoEncoder_Weights\Working\PgIC_decoder_256x_200e.pth", map_location=torch.device("cpu"))
+    torch.load(r"PgIC_decoder_256x_200e.pth", map_location=torch.device("cpu"))
     #torch.load(r"AutoEncoded_Image_Transfer\AutoEncoder_Weights\PgIC_decoder_9M.pth", map_location=torch.device("cpu"))
 
 )   
@@ -110,7 +110,7 @@ def get_host_ip():
         return None
 
 if __name__ == "__main__":
-    server_ip = get_host_ip()  # Keep the server IP here
+    server_ip = get_host_ip()  # Replace with server IP when not working locally
     server_port = 55555  # Random port which is free at any time
 
     receive_image_client(server_ip, server_port)
