@@ -10,7 +10,7 @@ from PIL import Image
 import io
 import torchvision.transforms as transforms
 
-class Encoder(nn.Module): # Old architecture (1M)
+class Encoder(nn.Module): 
     def __init__(self):
         super(Encoder, self).__init__()
         self.conv1 = nn.Conv2d(3, 32, kernel_size=3, stride=2, padding=1)
@@ -27,28 +27,11 @@ class Encoder(nn.Module): # Old architecture (1M)
         x = self.bottleneck(x)
         return x
 
-# Encoder
-# class Encoder(nn.Module): # New architecture (9M)
-#     def __init__(self):
-#         super(Encoder, self).__init__()
-#         self.conv1 = nn.Conv2d(3, 64, kernel_size=5, stride=2, padding=2)
-#         self.conv2 = nn.Conv2d(64, 128, kernel_size=5, stride=2, padding=2)
-#         self.conv3 = nn.Conv2d(128, 256, kernel_size=5, stride=2, padding=2)
-#         self.conv4 = nn.Conv2d(256, 512, kernel_size=5, stride=2, padding=2)
-#         self.bottleneck = nn.Conv2d(512, 64, kernel_size=3, stride=1, padding=1)
-
-#     def forward(self, x):
-#         x = F.relu(self.conv1(x))
-#         x = F.relu(self.conv2(x))
-#         x = F.relu(self.conv3(x))
-#         x = F.relu(self.conv4(x))
-#         x = self.bottleneck(x)
-#         return x
 
 encoder = Encoder()
 # here if Tests/Scripts/encoder_model.pth is not found then try using Tests\Scripts\encoder_model.pth
 encoder.load_state_dict(
-    torch.load(r'PgIC_encoder_1M.pth', map_location=torch.device('cpu'))
+    torch.load(r'PgIC_encoder_b8.pth', map_location=torch.device('cpu'))
     #torch.load(r'AutoEncoded_Image_Transfer\AutoEncoder_Weights\PgIC_encoder_9M.pth', map_location=torch.device('cpu'))
     )
 encoder.eval()
