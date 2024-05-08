@@ -44,7 +44,7 @@ def display_received_image(image_data):
 
 
 if __name__ == "__main__":
-    server_ip = "10.50.25.126"  # Keep the server IP here
+    server_ip = "10.20.61.160"  # Keep the server IP here
     server_port = 55555  # Random port which is free at any time
 
     receive_image_client(server_ip, server_port)

@@ -48,7 +48,7 @@ class Encoder(nn.Module): # Old architecture (1M)
 encoder = Encoder()
 # here if Tests/Scripts/encoder_model.pth is not found then try using Tests\Scripts\encoder_model.pth
 encoder.load_state_dict(
-    torch.load(r'PgIC_encoder_256x_200e.pth', map_location=torch.device('cpu'))
+    torch.load(r'PgIC_encoder_1M.pth', map_location=torch.device('cpu'))
     #torch.load(r'AutoEncoded_Image_Transfer\AutoEncoder_Weights\PgIC_encoder_9M.pth', map_location=torch.device('cpu'))
     )
 encoder.eval()

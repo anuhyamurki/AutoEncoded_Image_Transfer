@@ -38,8 +38,17 @@ def send_image_server(ip, port, image_path):
         data_connection.sendall(image_data_with_time)
         data_connection.close()
 
+def get_host_ip():
+    try:
+        host_name = socket.gethostname()
+        host_ip = socket.gethostbyname(host_name)
+        return host_ip
+    except:
+        print("Unable to get Hostname and IP")
+        return None
+
 if __name__ == "__main__":
-    server_ip = '10.53.29.124'
+    server_ip = get_host_ip()
     server_port = 55555
     image_path = "./Lake.jpg"
 
