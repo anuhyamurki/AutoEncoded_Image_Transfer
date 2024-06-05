@@ -1,13 +1,11 @@
 import socket
-import tkinter as tk
-from tkinter import filedialog
 import time
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import cv2 as cv
 from PIL import Image
 import io
+import os
 import torchvision.transforms as transforms
 
 class Encoder(nn.Module): 
@@ -27,17 +25,15 @@ class Encoder(nn.Module):
         x = self.bottleneck(x)
         return x
 
-
 encoder = Encoder()
-# here if Tests/Scripts/encoder_model.pth is not found then try using Tests\Scripts\encoder_model.pth
 encoder.load_state_dict(
     torch.load(r'PgIC_encoder_b8.pth', map_location=torch.device('cpu'))
-    #torch.load(r'AutoEncoded_Image_Transfer\AutoEncoder_Weights\PgIC_encoder_9M.pth', map_location=torch.device('cpu'))
-    )
+)
 encoder.eval()
 
-def send_image_server(ip, port, image_path):
+def send_image_server(ip, port, image_folder):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server_socket.bind((ip, port))
     server_socket.listen(1)
 
@@ -47,36 +43,34 @@ def send_image_server(ip, port, image_path):
         data_connection, address = server_socket.accept()
         print(f"Connection from {address}")
 
-         
-        with open(image_path, 'rb') as file:
-            image_data = file.read()
-            pil_image = Image.open(io.BytesIO(image_data))
+        image_files = [os.path.join(image_folder, f) for f in os.listdir(image_folder) if f.lower().endswith(('.jpg', '.jpeg'))]
 
-        transform = transforms.Compose([
-        transforms.Resize((256, 256)),
-        transforms.ToTensor(),
-        ])
+        for image_file in image_files:
+            with open(image_file, 'rb') as file:
+                image_data = file.read()
+                pil_image = Image.open(io.BytesIO(image_data))
+            print(f"Sending image: {image_file}")
+            transform = transforms.Compose([
+                transforms.Resize((256, 256)),
+                transforms.ToTensor(),
+            ])
 
-        # Convert the resized image to a tensor
-        pil_image = pil_image.convert('RGB')
+            pil_image = pil_image.convert('RGB')
+            image_tensor = transform(pil_image).unsqueeze(0)
 
-        image_tensor = transform(pil_image).unsqueeze(0)
-        pil_resized = pil_image.resize((256, 256))
-        pil_resized.save('resized_image.png')
-        # Pass the resized image tensor to the encoder
-        encoded_output = encoder(image_tensor)
+            encoded_output = encoder(image_tensor)
 
-        buffer = io.BytesIO()
-        torch.save(encoded_output, buffer)
-        encoded_output_bytes = buffer.getvalue()
-        start_time = time.time()   
-        # Now you can send `encoded_output_bytes` over the network connection
-        # For example, assuming `data_connection` is a socket
-        
-        # Here we are sending the encoded output bytes and the start time of the transfer
-        # b'   ' is used as a delimiter to separate the encoded output bytes and the start time
-        encoded_output_bytes=encoded_output_bytes+b'   '+(str(start_time)).encode()
-        data_connection.sendall(encoded_output_bytes)
+            buffer = io.BytesIO()
+            torch.save(encoded_output, buffer)
+            encoded_output_bytes = buffer.getvalue()
+
+            start_time = time.time()
+            start_time_str = f"{start_time:<20}"  # Fixed length for start time
+            encoded_output_bytes = start_time_str.encode() + encoded_output_bytes
+
+            data_connection.sendall(encoded_output_bytes + b"END_OF_IMAGE")
+            time.sleep(8)  # Add a delay of 5 seconds between sending each image
+
         data_connection.close()
 
 def get_host_ip():
@@ -89,14 +83,8 @@ def get_host_ip():
         return None
 
 if __name__ == "__main__":
-   
-    server_ip = get_host_ip() # Keep the server ip
-    server_port = 55555 # any random always free port
-    root = tk.Tk()
-    root.withdraw()
+    server_ip = get_host_ip()
+    server_port = 44444
+    image_folder = "../Images"
 
-    file_path = filedialog.askopenfilename()
-    print(file_path)
-    image_to_send = file_path  # Replace with the actual image path
-
-    send_image_server(server_ip, server_port, image_to_send)
+    send_image_server(server_ip, server_port, image_folder)

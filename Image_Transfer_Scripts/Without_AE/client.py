@@ -9,32 +9,33 @@ def receive_image_client(server_ip, server_port):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((server_ip, server_port))
 
-    start_time = time.time()
+    delimiter = b"END_OF_IMAGE"
+    buffer = b""
 
-    image_data = b""
     while True:
         chunk = client_socket.recv(1024)
         if not chunk:
             break
-        image_data += chunk
+        buffer += chunk
+
+        while delimiter in buffer:
+            image_data, buffer = buffer.split(delimiter, 1)
+            process_image(image_data)
+
+    client_socket.close()
+
+def process_image(image_data):
+    start_time_length = 20  # Fixed length of the start time string
+    start_time_str = image_data[:start_time_length].decode().strip()
+    image_data = image_data[start_time_length:]
 
     end_time = time.time()
-    # 5 spaces(tab characters to separate image data from the start_time engraved in image)
-
-    start_time = (image_data.split(b"     ")[1]).decode()
-    image_data = image_data.split(b"     ")[0]
-
-    # Transfer time is calculated here
-    transfer_time = end_time - float(start_time)
+    transfer_time = end_time - float(start_time_str)
     received_encoded_output = BytesIO(image_data)
 
     print(f"Image received successfully in {transfer_time} seconds")
 
-
-    client_socket.close()
-    display_received_image(image_data)
-
-
+    #display_received_image(image_data)
 
 def display_received_image(image_data):
     image = Image.open(BytesIO(image_data))
@@ -42,9 +43,8 @@ def display_received_image(image_data):
     plt.title("Received Image")
     plt.show()
 
-
 if __name__ == "__main__":
-    server_ip = "10.20.61.160"  # Keep the server IP here
+    server_ip = "192.168.0.109"  # Keep the server IP here
     server_port = 55555  # Random port which is free at any time
 
     receive_image_client(server_ip, server_port)
